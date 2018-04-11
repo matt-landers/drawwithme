@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "sourceMap": true,
+    "target": "es5",
+    "outDir": "./wwwroot/js",
+  },
+  "files": [
+    "./scripts/models.ts",
+    "./scripts/app.ts"
+  ],
+  "compileOnSave": true
+}
