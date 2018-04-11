@@ -1,0 +1,109 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+    string canvasId = (Guid.NewGuid()).ToString();
+}
+
+<canvas id="canvas">
+
+</canvas>
+
+<div class="modal fade" id="startModal" tabindex="-1" role="dialog" aria-labelledby="startModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="startModalLabel">Share or Join?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+            <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Share with Friend:</label>
+                <p id="shareCanvasId">@canvasId</p>
+            </div>
+          <div class="form-group">
+            <label for="message-text" class="col-form-label">or Join a Canvas:</label>
+            <input class="form-control" id="joinCanvasId" />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id="btnJoin" type="button" class="btn btn-primary">Join</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+<script>
+    $(document).ready(function () { 
+
+        var canvasId = '@canvasId',
+            drawing = false,
+            joinedCanvas = false,
+            canvas = $('#canvas')[0],
+            ctx = canvas.getContext("2d"),
+            $joinCanvasId = $('#joinCanvasId'),
+            startModal = $('#startModal'),
+            connection = new signalR.HubConnection(new signalR.HttpConnection('/hubs/drawing', { transport: signalR.TransportType.WebSockets }));
+
+        ctx.canvas.width = document.body.clientWidth;
+        ctx.canvas.height = document.body.clientWidth;
+
+        connection.start();
+
+        startModal.modal('show');
+        startModal.on('hidden.bs.modal', function (e) {
+            joinCanvas($('#shareCanvasId').text());
+        });
+
+        $('#btnJoin').click(function (e) { 
+            joinCanvas($joinCanvasId.val());
+        });
+
+        var prevPoint;
+        connection.on("NewPoint", function(point) {
+            if (prevPoint != null) return draw(point);
+            prevPoint = point;
+        });
+
+        function joinCanvas(id) { 
+            if (joinedCanvas) return; //Already joined a canvas, so leave
+            connection.invoke('JoinCanvas', id);
+            canvasId = id;
+            joinedCanvas = true;
+        }
+
+        function draw(point) {
+            console.log(`prevX: ${prevPoint.x}`)
+            console.log(`currX: ${point.x}`)
+            ctx.beginPath();
+            ctx.moveTo(prevPoint.x, prevPoint.y);
+            ctx.lineTo(point.x, point.y);
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.closePath();
+            prevPoint = point;
+        }
+
+        function newPoint(e) { 
+            if (!joinedCanvas || !drawing) return;
+            connection.invoke('Draw', e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop, canvasId);
+        }
+
+        function toggleDrawing(shouldDraw) { 
+            drawing = shouldDraw;
+            if (!shouldDraw) prevPoint = null;
+        }
+
+        canvas.addEventListener("mousemove", newPoint.bind(null), false);
+        canvas.addEventListener("mousedown", toggleDrawing.bind(null, true), false);
+        canvas.addEventListener("mouseup", toggleDrawing.bind(null, false), false);
+    });
+</script>
+}
