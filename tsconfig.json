@@ -4,7 +4,7 @@
     "noEmitOnError": true,
     "sourceMap": true,
     "target": "es5",
-    "outDir": "./wwwroot/js",
+    "outDir": "./scripts/dist"
   },
   "files": [
     "./scripts/models.ts",

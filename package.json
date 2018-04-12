@@ -4,7 +4,8 @@
   "private": true,
   "devDependencies": {},
   "scripts": {
-    "build:ts": "tsc"
+    "build:ts": "tsc",
+    "bundle": "npm run build:ts && browserify ./scripts/dist/app.js -o ./wwwroot/js/app.js"
   },
   "dependencies": {
     "@aspnet/signalr": "^1.0.0-preview2-final"
