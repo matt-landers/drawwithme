@@ -8,6 +8,8 @@
     "bundle": "npm run build:ts && browserify ./scripts/dist/app.js -o ./wwwroot/js/app.js"
   },
   "dependencies": {
-    "@aspnet/signalr": "^1.0.0-preview2-final"
+    "@aspnet/signalr": "^1.0.0-preview2-final",
+    "typescript": "latest",
+    "browserify": "latest"
   }
 }
