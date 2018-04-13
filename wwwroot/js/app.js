@@ -1580,7 +1580,7 @@ var signalR = require("@aspnet/signalr");
 $(document).ready(function () {
     var canvasId = '@canvasId', drawing = false, joinedCanvas = false, _artistId, _artists = [], $canvas = $('#canvas')[0], ctx = $canvas.getContext("2d"), $joinCanvasId = $('#joinCanvasId'), $startModal = $('#startModal'), connection = new signalR.HubConnection(new signalR.HttpConnection('/hubs/drawing', { transport: signalR.TransportType.WebSockets }));
     ctx.canvas.width = document.body.clientWidth;
-    ctx.canvas.height = document.body.clientWidth;
+    ctx.canvas.height = document.body.clientHeight;
     connection.start();
     $startModal.modal('show');
     $startModal.on('hidden.bs.modal', function () {
@@ -1631,6 +1631,8 @@ $(document).ready(function () {
         _artists[point.artistid].PreviousPoint = point;
     }
     function newPoint(e) {
+        if (e.touches)
+            e = e.touches[0];
         if (!joinedCanvas || !drawing)
             return;
         connection.invoke('Draw', e.clientX - $canvas.offsetLeft, e.clientY - $canvas.offsetTop, canvasId, _artistId);
@@ -1644,6 +1646,9 @@ $(document).ready(function () {
     $canvas.addEventListener("mousemove", newPoint.bind(null), false);
     $canvas.addEventListener("mousedown", toggleDrawing.bind(null, true), false);
     $canvas.addEventListener("mouseup", toggleDrawing.bind(null, false), false);
+    $canvas.addEventListener("touchstart", toggleDrawing.bind(null, true), false);
+    $canvas.addEventListener("touchend", toggleDrawing.bind(null, false), false);
+    $canvas.addEventListener("touchmove", newPoint.bind(null), false);
 });
 
 },{"@aspnet/signalr":14}]},{},[15]);
