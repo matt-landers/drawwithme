@@ -32,8 +32,8 @@ $(document).ready(function () {
 
     var prevPoint: IPoint;
     connection.on("NewPoint", (point: IPoint) => {
-        if (_artists[point.artistid].PreviousPoint != null) return draw(point);
-        if (point.x != null) {
+        if (_artists[point.artistid].PreviousPoint !== null) return draw(point);
+        if (point.x !== null) {
             _artists[point.artistid].PreviousPoint = point;
         } else {
             _artists[point.artistid].PreviousPoint = null;
@@ -81,7 +81,7 @@ $(document).ready(function () {
 
     function toggleDrawing(shouldDraw: boolean) {
         drawing = shouldDraw;
-        if (!shouldDraw) connection.invoke('ClearPoint', canvasId, _artistId);;
+        if (!shouldDraw) connection.invoke('ClearPoint', canvasId, _artistId);
     }
 
     $canvas.addEventListener("mousemove", newPoint.bind(null), false);
