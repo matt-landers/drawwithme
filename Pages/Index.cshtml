@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Home page";
     string canvasId = (Guid.NewGuid()).ToString();
+    string canvasUrl = $"";
+    
 }
 
 <canvas id="canvas">
@@ -13,7 +15,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="startModalLabel">Share or Join?</h5>
+        <h5 class="modal-title" id="startModalLabel">Share Your Canvas</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -22,17 +24,13 @@
         <form>
             <div class="form-group">
                 <label for="recipient-name" class="col-form-label">Share with Friend:</label>
-                <p id="shareCanvasId">@canvasId</p>
+                <a class="d-block" href="/?canvasid=@canvasId" target="_blank">@Request.Scheme://@Request.Host/?canvasid=@canvasId</a>
+                <p class="d-none" id="shareCanvasId">@canvasId</p>
             </div>
-          <div class="form-group">
-            <label for="message-text" class="col-form-label">or Join a Canvas:</label>
-            <input class="form-control" id="joinCanvasId" />
-          </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button id="btnJoin" type="button" class="btn btn-primary">Join</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Start Drawing</button>
       </div>
     </div>
   </div>

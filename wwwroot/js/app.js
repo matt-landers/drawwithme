@@ -1578,17 +1578,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /// <reference path="./models.ts" />
 var signalR = require("@aspnet/signalr");
 $(document).ready(function () {
-    var _canvasId = '@canvasId', _drawing = false, _joinedCanvas = false, _artistId, _artists = [], $joinCanvasId = $('#joinCanvasId'), $startModal = $('#startModal'), $canvas = $('#canvas')[0], _ctx = $canvas.getContext("2d"), _connection = new signalR.HubConnection(new signalR.HttpConnection('/hubs/drawing', { transport: signalR.TransportType.WebSockets }));
+    var _canvasId = '', _drawing = false, _joinedCanvas = false, _artistId, _artists = [], _query = getUrlVars(), $joinCanvasId = $('#joinCanvasId'), $startModal = $('#startModal'), $canvas = $('#canvas')[0], _ctx = $canvas.getContext("2d"), _connection = new signalR.HubConnection(new signalR.HttpConnection('/hubs/drawing', { transport: signalR.TransportType.WebSockets }));
+    console.log($('#shareCanvasId').text());
     _ctx.canvas.width = document.body.clientWidth;
     _ctx.canvas.height = document.body.clientHeight;
-    _connection.start();
-    $startModal.modal('show');
+    _connection.start()
+        .then(function () {
+        if (_query['canvasid']) {
+            joinCanvas(_query['canvasid']);
+        }
+        else {
+            $startModal.modal('show');
+        }
+    }).catch(function (e) {
+        console.log(e);
+        alert('Error: Could not connect to the server.');
+    });
     $startModal.on('hidden.bs.modal', function () {
         joinCanvas($('#shareCanvasId').text());
-    });
-    $('#btnJoin').click(function () {
-        joinCanvas($joinCanvasId.val());
-        $startModal.modal('hide');
     });
     var prevPoint;
     _connection.on("NewPoint", function (point) {
@@ -1656,5 +1663,15 @@ $(document).ready(function () {
     $canvas.addEventListener("mouseup", stopDrawing.bind(null), false);
     $canvas.addEventListener("touchend", stopDrawing.bind(null), false);
 });
+function getUrlVars() {
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for (var i = 0; i < hashes.length; i++) {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+    }
+    return vars;
+}
 
 },{"@aspnet/signalr":14}]},{},[15]);
