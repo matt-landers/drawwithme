@@ -1578,10 +1578,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /// <reference path="./models.ts" />
 var signalR = require("@aspnet/signalr");
 $(document).ready(function () {
-    var canvasId = '@canvasId', drawing = false, joinedCanvas = false, _artistId, _artists = [], $canvas = $('#canvas')[0], ctx = $canvas.getContext("2d"), $joinCanvasId = $('#joinCanvasId'), $startModal = $('#startModal'), connection = new signalR.HubConnection(new signalR.HttpConnection('/hubs/drawing', { transport: signalR.TransportType.WebSockets }));
-    ctx.canvas.width = document.body.clientWidth;
-    ctx.canvas.height = document.body.clientHeight;
-    connection.start();
+    var _canvasId = '@canvasId', _drawing = false, _joinedCanvas = false, _artistId, _artists = [], $joinCanvasId = $('#joinCanvasId'), $startModal = $('#startModal'), $canvas = $('#canvas')[0], _ctx = $canvas.getContext("2d"), _connection = new signalR.HubConnection(new signalR.HttpConnection('/hubs/drawing', { transport: signalR.TransportType.WebSockets }));
+    _ctx.canvas.width = document.body.clientWidth;
+    _ctx.canvas.height = document.body.clientHeight;
+    _connection.start();
     $startModal.modal('show');
     $startModal.on('hidden.bs.modal', function () {
         joinCanvas($('#shareCanvasId').text());
@@ -1591,7 +1591,7 @@ $(document).ready(function () {
         $startModal.modal('hide');
     });
     var prevPoint;
-    connection.on("NewPoint", function (point) {
+    _connection.on("NewPoint", function (point) {
         if (_artists[point.artistid].PreviousPoint != null)
             return draw(point);
         if (point.x != null) {
@@ -1601,54 +1601,60 @@ $(document).ready(function () {
             _artists[point.artistid].PreviousPoint = null;
         }
     });
-    connection.on("NewArtist", function (artists) {
-        console.log(artists);
+    _connection.on("NewArtist", function (artists) {
         _artists = artists;
     });
-    connection.on("ClearPoint", function (artistId) {
+    _connection.on("ClearPoint", function (artistId) {
         _artists[artistId].PreviousPoint = null;
     });
-    connection.on("JoinedCanvas", function (artistId, artists) {
+    _connection.on("JoinedCanvas", function (artistId, artists) {
         _artistId = artistId;
         _artists = artists;
-        joinedCanvas = true;
+        _joinedCanvas = true;
     });
     function joinCanvas(id) {
-        if (joinedCanvas)
+        if (_joinedCanvas)
             return; //Already joined a canvas, so leave
-        connection.invoke('JoinCanvas', id);
-        canvasId = id;
+        _connection.invoke('JoinCanvas', id);
+        _canvasId = id;
     }
     function draw(point) {
         var artist = _artists[point.artistid];
-        ctx.beginPath();
-        ctx.moveTo(artist.PreviousPoint.x, artist.PreviousPoint.y);
-        ctx.lineTo(point.x, point.y);
-        ctx.strokeStyle = artist.rgb;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        ctx.closePath();
+        if (artist.PreviousPoint != null) {
+            _ctx.beginPath();
+            _ctx.moveTo(artist.PreviousPoint.x, artist.PreviousPoint.y);
+            _ctx.lineTo(point.x, point.y);
+            _ctx.strokeStyle = artist.rgb;
+            _ctx.lineWidth = 1;
+            _ctx.stroke();
+            _ctx.closePath();
+        }
         _artists[point.artistid].PreviousPoint = point;
     }
-    function newPoint(e) {
+    function drawPoint(e) {
+        e.preventDefault();
         if (e.touches)
             e = e.touches[0];
-        if (!joinedCanvas || !drawing)
+        if (!_joinedCanvas || !_drawing)
             return;
-        connection.invoke('Draw', e.clientX - $canvas.offsetLeft, e.clientY - $canvas.offsetTop, canvasId, _artistId);
+        _connection.invoke('Draw', e.clientX - $canvas.offsetLeft, e.clientY - $canvas.offsetTop, _canvasId, _artistId);
     }
-    function toggleDrawing(shouldDraw) {
-        drawing = shouldDraw;
-        if (!shouldDraw)
-            connection.invoke('ClearPoint', canvasId, _artistId);
-        ;
+    function startDrawing(e) {
+        e.preventDefault();
+        _drawing = true;
+        drawPoint(e);
     }
-    $canvas.addEventListener("mousemove", newPoint.bind(null), false);
-    $canvas.addEventListener("mousedown", toggleDrawing.bind(null, true), false);
-    $canvas.addEventListener("mouseup", toggleDrawing.bind(null, false), false);
-    $canvas.addEventListener("touchstart", toggleDrawing.bind(null, true), false);
-    $canvas.addEventListener("touchend", toggleDrawing.bind(null, false), false);
-    $canvas.addEventListener("touchmove", newPoint.bind(null), false);
+    function stopDrawing(e) {
+        e.preventDefault();
+        _drawing = false;
+        _connection.invoke('ClearPoint', _canvasId, _artistId);
+    }
+    $canvas.addEventListener("mousemove", drawPoint.bind(null), false);
+    $canvas.addEventListener("touchmove", drawPoint.bind(null), false);
+    $canvas.addEventListener("mousedown", startDrawing.bind(null), false);
+    $canvas.addEventListener("touchstart", startDrawing.bind(null), false);
+    $canvas.addEventListener("mouseup", stopDrawing.bind(null), false);
+    $canvas.addEventListener("touchend", stopDrawing.bind(null), false);
 });
 
 },{"@aspnet/signalr":14}]},{},[15]);
