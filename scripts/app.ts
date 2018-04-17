@@ -1,6 +1,4 @@
-﻿/// <reference path="./models.ts" />
-declare var $: any;
-import * as signalR from '@aspnet/signalr';
+﻿import * as signalR from '@aspnet/signalr';
 
 $(document).ready(() => {
 
@@ -11,7 +9,7 @@ $(document).ready(() => {
         _artists: IArtist[] = [],
         _query = getUrlVars(),
         $joinCanvasId = $('#joinCanvasId'),
-        $startModal = $('#startModal'),
+        $startModal: any = $('#startModal'),
         $canvas = <HTMLCanvasElement>$('#canvas')[0],
         _ctx = $canvas.getContext("2d"),
         _connection = new signalR.HubConnection(new signalR.HttpConnection('/hubs/drawing', { transport: signalR.TransportType.WebSockets }));
