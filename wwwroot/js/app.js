@@ -1575,11 +1575,9 @@ __export(require("./Observable"));
 },{"./Errors":2,"./HttpClient":3,"./HttpConnection":4,"./HubConnection":5,"./IHubProtocol":6,"./ILogger":7,"./Loggers":9,"./Observable":10,"./Transports":12}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/// <reference path="./models.ts" />
-var signalR = require("@aspnet/signalr");
+var signalr_1 = require("@aspnet/signalr");
 $(document).ready(function () {
-    var _canvasId = '', _drawing = false, _joinedCanvas = false, _artistId, _artists = [], _query = getUrlVars(), $joinCanvasId = $('#joinCanvasId'), $startModal = $('#startModal'), $canvas = $('#canvas')[0], _ctx = $canvas.getContext("2d"), _connection = new signalR.HubConnection(new signalR.HttpConnection('/hubs/drawing', { transport: signalR.TransportType.WebSockets }));
-    console.log($('#shareCanvasId').text());
+    var _canvasId = '', _drawing = false, _joinedCanvas = false, _artistId, _artists = [], _query = getUrlVars(), $joinCanvasId = $('#joinCanvasId'), $startModal = $('#startModal'), $canvas = $('#canvas')[0], _ctx = $canvas.getContext("2d"), _connection = new signalr_1.HubConnection(new signalr_1.HttpConnection('/hubs/drawing', { transport: signalr_1.TransportType.WebSockets, logger: signalr_1.LogLevel.None }), { logger: signalr_1.LogLevel.None });
     _ctx.canvas.width = document.body.clientWidth;
     _ctx.canvas.height = document.body.clientHeight;
     _connection.start()

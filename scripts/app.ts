@@ -1,4 +1,4 @@
-﻿import * as signalR from '@aspnet/signalr';
+﻿import { LogLevel, HubConnection, HttpConnection, TransportType } from '@aspnet/signalr';
 
 $(document).ready(() => {
 
@@ -12,10 +12,8 @@ $(document).ready(() => {
         $startModal: any = $('#startModal'),
         $canvas = <HTMLCanvasElement>$('#canvas')[0],
         _ctx = $canvas.getContext("2d"),
-        _connection = new signalR.HubConnection(new signalR.HttpConnection('/hubs/drawing', { transport: signalR.TransportType.WebSockets }));
+        _connection = new HubConnection(new HttpConnection('/hubs/drawing', { transport: TransportType.WebSockets, logger: LogLevel.None }), { logger: LogLevel.None });
 
-    console.log($('#shareCanvasId').text());
-    
     _ctx.canvas.width = document.body.clientWidth;
     _ctx.canvas.height = document.body.clientHeight;
 
